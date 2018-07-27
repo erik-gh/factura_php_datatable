@@ -1,32 +1,47 @@
 $(document).ready(function () {
-    recordFacturas();
     mostrarForm(false);
-    recordsClientes();//Recorrer filas
+    recordFacturas();
+    $("#formFactura").on("submit", function (e) {
+        saveFactura(e);
+    });
+    recordClientes();//Recorrer filas
     ultNumSerie();
     $("#serie").change(ultNumSerie);
 
 });
-function saveFactura() {
-    //e.preventDefault();
-//    toma los datos con el atributo name
-    var formData = new FormData($("#formFactura")[0]);
-    $.ajax({
-        url: "../../app/controllers/factura.controller.php?opt=saveFactura",
-        type: "POST",
-        data: formData,
-        contentType: false,
-        processData: false,
-        success: function (data) {
-            //tabla.ajax.reload();
-        }
-    });
+function saveFactura(e) {
+    e.preventDefault();
+//   Toma los datos con el atributo name
+//    var formData = new FormData($("#formFactura")[0]);
+    var data = $("#formFactura").serializeArray();
+    console.log(data);
+
+    $.post("../../app/controllers/factura.controller.php?opt=saveFactura", data,
+            function () {
+                // clear fields from the popup
+                mostrarForm(false);
+                // read records again
+                tabla.ajax.reload();
+            });
+    /*
+     $.ajax({
+     url: "../../app/controllers/factura.controller.php?opt=saveFactura",
+     type: "POST",
+     data: formData,
+     contentType: false,
+     processData: false,
+     success: function (data) {
+     tabla.ajax.reload();
+     }
+     });
+     */
 }
 var tabla;
-function recordsClientes() {
+function recordClientes() {
     $.post("../../app/controllers/factura.controller.php?opt=readClientes",
             function (r) {
-                $("#idCliente").html(r);
-//        $('#idCliente').selectpicker('refresh');
+                $("#id_cliente").html(r);
+//        $('#id_cliente').selectpicker('refresh');
             });
 }
 function recordsProductos() {
@@ -93,9 +108,27 @@ function deleteDetalle(indice) {
     calcularTotales();
     detalles -= 1;
 }
-function detailsFactura() {
+function detailsFactura(idFactura) {
+    $.post("../../app/controllers/factura.controller.php?opt=detailsFactura", {idFactura: idFactura},
+            function (data, status) {
+                dataJson = JSON.parse(data);
+                console.log(dataJson);
+                mostrarForm(true);
+                jsondata = {
+                    id_cliente: "2",
+                    serie: "002",
+                    num_factura: "00000005",
+                    fec_fac: "2018-07-27"
+                }
+                console.log(jsondata);
+                $.each(jsondata, function (key, value) {
+                    $("#" + key).val(value);
+                });
+            });
+
 }
 function mostrarForm(flag) {
+    $("#formFactura")[0].reset();
     if (flag) {// si es true
         $("#divListadoFacturas").hide();
         $("#divRegistrarFactura").show();
@@ -115,8 +148,14 @@ function ultNumSerie() {
     $.post("../../app/controllers/factura.controller.php?opt=readSerie", {numSerie: NumSerie},
             function (data) {
                 dataJson = JSON.parse(data);
-                numeroMostrar = dataJson.num_factura.padStart(8, "0");
-                $("#numFac").val(numeroMostrar);
+                numeroMostrar = "";
+                if (dataJson) {
+                    numero = parseInt(dataJson.num_factura, 10) + 1;
+                    numeroMostrar = numero.toString().padStart(8, "0");
+                } else {
+                    numeroMostrar = "00000001";
+                }
+                $("#num_factura").val(numeroMostrar);
             });
 }
 

@@ -55,7 +55,7 @@
                 <form name="formFactura" id="formFactura" method="POST">
                     <div class="form-group col-md-5">
                         <label>Cliente(*) : </label>
-                        <select name="idCliente" id="idCliente" class="form-control" data-live-search="true" required></select>
+                        <select name="id_cliente" id="id_cliente" class="form-control" data-live-search="true" required></select>
                     </div>
                     <div class="form-group col-md-2">
                         <label>Serie(*) : </label>
@@ -67,14 +67,14 @@
                     </div>
                     <div class="form-group col-md-2">
                         <label>Numero(*) : </label>
-                        <input type="text" class="form-control" name="numFac" id="numFac" readonly>
+                        <input type="text" class="form-control" name="num_factura" id="num_factura" readonly>
                     </div>
                     <div class="form-group col-md-3">
                         <label>Fecha(*) : </label>
-                        <input type="date" class="form-control" name="fhFactura" id="fhFactura" required>
+                        <input type="date" class="form-control" name="fec_fac" id="fec_fac" required>
                     </div>
                     <div class="form-group col-md-12" style="text-align:center;">
-                        <input type="hidden" name="idFactura" id="idFactura">
+                        <input type="hidden" name="id_factura" id="id_factura">
                         <a data-toggle="modal" href="#myModal">
                             <button class="btn btn-primary" type="button" id="btnAgregarArt">Agregar Productos</button>
                         </a>
@@ -105,7 +105,7 @@
                         </table>
                     </div>
                     <div class="form-group col-md-12" id="divGuardarCancelar">
-                        <button class="btn btn-primary" id="btnGuardar" onclick="saveFactura()">Guardar</button>
+                        <button class="btn btn-primary" id="btnGuardar">Guardar</button>
                         <button class="btn btn-danger" id="btnCancelar" onclick="cancelarForm()" type="button">Cancelar</button>
                     </div>
                 </form>

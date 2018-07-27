@@ -22,7 +22,7 @@ class FacturaModel {
         return $query->fetchAll();
     }
 
-    public function saveFactura($arg_idcliente, $arg_serie, $arg_numfactura, $arg_fechora, $arg_totalventa, $arg_idfactura) {
+    public function saveFactura($arg_id_cliente, $arg_serie, $arg_numfactura, $arg_fechora, $arg_totalventa, $arg_idfactura) {
         $query = null;
         if ($arg_idfactura === null) {
             $query = $this->db->prepare("INSERT INTO tb_factura(id_cliente,serie,num_factura,fec_hora,total_venta) VALUES(:id_cliente,:serie,:num_factura,:fec_hora,:total_venta)");
@@ -31,7 +31,7 @@ class FacturaModel {
             $query->bindParam(":id_factura", $arg_idfactura);
         }
 
-        $query->bindParam(":id_cliente", $arg_idcliente);
+        $query->bindParam(":id_cliente", $arg_id_cliente);
         $query->bindParam(":serie", $arg_serie);
         $query->bindParam(":num_factura", $arg_numfactura);
         $query->bindParam(":fec_hora", $arg_fechora);
@@ -48,7 +48,7 @@ class FacturaModel {
     }
 
     public function readNumeroSerie($arg_serie) {
-        $query = $this->db->prepare("SELECT (num_factura+1) AS num_factura FROM tb_factura WHERE serie = :serie ORDER BY num_factura DESC LIMIT 1");
+        $query = $this->db->prepare("SELECT num_factura FROM tb_factura WHERE serie = :serie ORDER BY num_factura DESC LIMIT 1");
         $query->bindParam(":serie", $arg_serie);
         $query->execute();
         return $query->fetch();

@@ -4,7 +4,7 @@ require_once '../models/factura.model.php';
 $objFactura = new FacturaModel();
 
 
-$idFactura = (!empty($_POST['idFactura'])) ? $_POST['idFactura'] : null;
+$id_factura = (!empty($_POST['id_factura'])) ? $_POST['id_factura'] : null;
 $opt = (string) filter_input(INPUT_GET, 'opt');
 switch ($opt) {
     case 'readFacturas':
@@ -17,7 +17,7 @@ switch ($opt) {
                 "2" => $key->serie . " - " . str_pad($key->num_factura, 8, "0", STR_PAD_LEFT),
                 "3" => $key->fec_hora,
                 "4" => $key->total_venta,
-                "5" => "<button class='btn btn-warning' onclick='getFacturaDetails(" . $key->id_factura . ")'>Actualizar</button>",
+                "5" => "<button class='btn btn-warning' onclick='detailsFactura(" . $key->id_factura . ")'>Ver Detalle</button>",
                 "6" => "<button class='btn btn-danger' onclick='deleteFactura(" . $key->id_factura . ")'>Eliminar</button>"
             ];
         }
@@ -26,10 +26,10 @@ switch ($opt) {
         break;
     case 'saveFactura':
         /* Varibles de Factura */
-        $idClie = isset($_POST['idCliente']) ? $_POST['idCliente'] : null;
+        $idClie = isset($_POST['id_cliente']) ? $_POST['id_cliente'] : null;
         $serie = isset($_POST['serie']) ? $_POST['serie'] : null;
-        $numSerFac = isset($_POST['numFac']) ? $_POST['numFac'] : null;
-        $fhFact = isset($_POST['fhFactura']) ? $_POST['fhFactura'] : null;
+        $numSerFac = isset($_POST['num_factura']) ? $_POST['num_factura'] : null;
+        $fhFact = isset($_POST['fec_fac']) ? $_POST['fec_fac'] : null;
         $totVent = isset($_POST['total_venta']) ? $_POST['total_venta'] : null;
 
         /* Varibles de Detalle Factura */
@@ -41,7 +41,8 @@ switch ($opt) {
         $lastIdFactura = $objFactura->saveFactura($idClie, $serie, $numSerFac, $fhFact, $totVent, $idFactura);
         require_once '../models/factura_detalle.model.php';
         $objDetFactura = new DetalleFacturaModel();
-        for ($i = 0; $i < count($idProd); $i++) {
+        $cant_prod = count($idProd);
+        for ($i = 0; $i < $cant_prod; $i++) {
             $objDetFactura->saveDetalleFactura($lastIdFactura, $idProd[$i], $canProd[$i], $preVent[$i]);
         }
         break;
