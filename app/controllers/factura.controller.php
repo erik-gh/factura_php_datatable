@@ -15,7 +15,7 @@ switch ($opt) {
                 "0" => $key->id_factura,
                 "1" => $key->nombre,
                 "2" => $key->serie . " - " . str_pad($key->num_factura, 8, "0", STR_PAD_LEFT),
-                "3" => $key->fec_hora,
+                "3" => $key->fec_fac,
                 "4" => $key->total_venta,
                 "5" => "<button class='btn btn-warning' onclick='detailsFactura(" . $key->id_factura . ")'>Ver Detalle</button>",
                 "6" => "<button class='btn btn-danger' onclick='deleteFactura(" . $key->id_factura . ")'>Eliminar</button>"

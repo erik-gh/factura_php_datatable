@@ -73,7 +73,7 @@ CREATE TABLE `tb_factura` (
   `id_cliente` int(11) NOT NULL,
   `serie` varchar(3) DEFAULT NULL,
   `num_factura` varchar(8) DEFAULT NULL,
-  `fec_hora` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `fec_fac` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `total_venta` decimal(10,2) NOT NULL,
   PRIMARY KEY (`id_factura`) USING BTREE,
   KEY `fk_tb_factura_tb_cliente` (`id_cliente`) USING BTREE
