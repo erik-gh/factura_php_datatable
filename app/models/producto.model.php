@@ -16,13 +16,9 @@ class ProductoModel {
     }
 
     public function readProductos() {
-        $cd_q = "SELECT * FROM tb_producto";
-        $query = $this->db->prepare($cd_q);
+        $query = $this->db->prepare("SELECT * FROM tb_producto");
         $query->execute();
         return $query->fetchAll();
-    }
-    
-    public function saveFacturas(){       
     }
 
 }

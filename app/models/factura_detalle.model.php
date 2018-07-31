@@ -26,4 +26,20 @@ class DetalleFacturaModel {
         $query->execute();
     }
 
+    public function recordDetalleFactura($arg_idFactura) {
+        $cslt = "SELECT DF.id_dfactura,P.descripcion,DF.cantidad,DF.pre_venta,(DF.cantidad*DF.pre_venta) AS subtotal
+                 FROM tb_detalle_factura DF INNER JOIN tb_producto P ON DF.id_producto=P.id_producto
+                 WHERE id_factura = :id_factura;";
+        $query = $this->db->prepare($cslt);
+        $query->bindParam(":id_factura", $arg_idFactura);
+        $query->execute();
+        return $query->fetchAll();
+    }
+
+    public function deleteDetalleFactura($arg_idFactura) {
+        $query = $this->db->prepare("DELETE FROM tb_detalle_factura WHERE id_factura= :id_factura");
+        $query->bindParam(":id_factura", $arg_idFactura);
+        $query->execute();
+    }
+
 }

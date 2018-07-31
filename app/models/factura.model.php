@@ -41,7 +41,7 @@ class FacturaModel {
     }
 
     public function detailsFactura($arg_id_factura) {
-        $query = $this->db->prepare("select * from tb_factura where id_factura = :id_factura");
+        $query = $this->db->prepare("SELECT * FROM tb_factura WHERE id_factura = :id_factura");
         $query->bindParam(":id_factura", $arg_id_factura);
         $query->execute();
         return $query->fetch();
@@ -52,6 +52,12 @@ class FacturaModel {
         $query->bindParam(":serie", $arg_serie);
         $query->execute();
         return $query->fetch();
+    }
+
+    public function deleteFactura($arg_id_factura) {
+        $query = $this->db->prepare("DELETE FROM tb_factura WHERE id_factura = :id_factura");
+        $query->bindParam(":id_factura", $arg_id_factura);
+        $query->execute();
     }
 
 }

@@ -1,11 +1,13 @@
 <?php
 
 require_once '../models/factura.model.php';
+require_once '../models/factura_detalle.model.php';
 $objFactura = new FacturaModel();
+$objDetFactura = new DetalleFacturaModel();
 
-
-$id_factura = (!empty($_POST['id_factura'])) ? $_POST['id_factura'] : null;
+$idFactura = (!empty($_GET['id_factura'])) ? $_GET['id_factura'] : null;
 $opt = (string) filter_input(INPUT_GET, 'opt');
+
 switch ($opt) {
     case 'readFacturas':
         $ary_listFacturas = $objFactura->readFacturas();
@@ -39,8 +41,7 @@ switch ($opt) {
         $preVent = isset($_POST['precVenta']) ? $_POST['precVenta'] : null;
 
         $lastIdFactura = $objFactura->saveFactura($idClie, $serie, $numSerFac, $fhFact, $totVent, $idFactura);
-        require_once '../models/factura_detalle.model.php';
-        $objDetFactura = new DetalleFacturaModel();
+        // ingreso de Detalles de la factura
         $cant_prod = count($idProd);
         for ($i = 0; $i < $cant_prod; $i++) {
             $objDetFactura->saveDetalleFactura($lastIdFactura, $idProd[$i], $canProd[$i], $preVent[$i]);
@@ -50,8 +51,25 @@ switch ($opt) {
         $detFactura = $objFactura->detailsFactura($idFactura);
         echo json_encode($detFactura);
         break;
+    case 'detailDetFactura':
+        $aray_lisDetfactura = $objDetFactura->recordDetalleFactura($idFactura);
+        $data = [];
+        foreach ($aray_lisDetfactura as $key) {
+            $data[] = [
+                "0" => $key->id_dfactura,
+                "1" => $key->descripcion,
+                "2" => $key->cantidad,
+                "3" => $key->pre_venta,
+                "4" => $key->subtotal,
+                "5" => "Solo vista",
+            ];
+        }
+        $rDataTable = array("aaData" => $data);
+        echo json_encode($rDataTable);
+        break;
     case 'deleteFactura':
-
+        $objFactura->deleteFactura($idFactura);
+        $objDetFactura->deleteDetalleFactura($idFactura);
         break;
     case 'readSerie':
         $nSerie = !empty($_POST['numSerie']) ? $_POST['numSerie'] : null;

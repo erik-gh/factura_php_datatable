@@ -21,7 +21,7 @@
             <div class="panel-body" id="divListadoFacturas">
                 <div class="row">
                     <div class="pull-right">
-                        <button id="btnAgregar" class="btn btn-success" onclick="mostrarForm(true)">Agregar Factura</button>
+                        <button id="btnAgregar" class="btn btn-success" onclick="agregarFactura()">Agregar Factura</button>
                     </div>
                     <h1> LISTADO FACTURA </h1>
                 </div>
@@ -89,19 +89,19 @@
                             <th>SubTotal</th>
                             <th>Opciones</th>
                             </thead>
+                            <tbody></tbody>
                             <tfoot>
                             <th>TOTAL</th>
                             <th></th>
                             <th></th>
                             <th></th>
-                            <th>
-                                <h4 id="total">S/.0.00</h4>
-                                <input type="hidden" name="total_venta" id="total_venta">
+                            <th>    
+                                <label for="total_venta">S/.
+                                    <input type="text" name="total_venta" id="total_venta" placeholder="0.00" readonly="true" style="border:0;" size="10">
+                                </label>
                             </th>
                             <th></th>
                             </tfoot>
-                            <tbody>
-                            </tbody>
                         </table>
                     </div>
                     <div class="form-group col-md-12" id="divGuardarCancelar">

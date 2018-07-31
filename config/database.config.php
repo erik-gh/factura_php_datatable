@@ -9,7 +9,7 @@ class Database {
     private $_charset;
 
     function __construct() {
-        $this->_host = 'localhost:4040';
+        $this->_host = 'localhost';
         $this->_user = 'root';
         $this->_password = '';
         $this->_db_name = 'db_factura';
