@@ -21,7 +21,7 @@
             <div class="panel-body" id="divListadoFacturas">
                 <div class="row">
                     <div class="pull-right">
-                        <button id="btnAgregar" class="btn btn-success" onclick="agregarFactura()">Agregar Factura</button>
+                        <button id="btnAgregar" class="btn btn-success" onclick="btnAgregarFactura()">Agregar Factura</button>
                     </div>
                     <h1> LISTADO FACTURA </h1>
                 </div>

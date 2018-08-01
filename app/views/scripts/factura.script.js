@@ -3,65 +3,42 @@ var cont = 0;
 var detalles = 0;
 var tabProductos;
 var tabDetfactura = null;
+
 $(document).ready(function () {
-//    mostrarForm(false);
+    mostrarForm(true);
     recordFacturas();
     $("#formFactura").on("submit", function (e) {
         saveFactura(e);
     });
     $("#serie").change(ultNumSerie);
 });
-function agregarFactura() {
-    recordClientes();//Recorrer filas
-    ultNumSerie(); // llena el numero de factura
-    mostrarForm();
-    recordsProductos();
-    $("#btnAgregarArt").show();
-    $("#btnGuardar").show();
-//    tabProductos.ajax.reload();
-    var fn = new Date();
-    var dia = ("0" + fn.getDate()).slice(-2);
-    var mes = ("0" + (fn.getMonth() + 1)).slice(-2);
-    var hoy = fn.getFullYear() + "-" + (mes) + "-" + (dia);
-    $("#fec_fac").val(hoy);
-    if (tabDetfactura != null) {
-        tabDetfactura.clear().draw();
-        tabDetfactura.destroy();
-        tabDetfactura = null;
-    }
 
+function saveFactura(e) {
+    e.preventDefault();
+    var data = $("#formFactura").serializeArray();
+    $.post("../../app/controllers/factura.controller.php?opt=saveFactura", data,
+            function () {
+                mostrarForm(true);
+                $(".filas").remove();
+                tabla.ajax.reload();
+            });
 }
-function mostrarForm(flag) {
-    if (flag) {// si es true
-//        $("#divListadoFacturas").hide();
-//        $("#divRegistrarFactura").show();
-//         tabProductos.ajax.reload();
-//         tabDetfactura.ajax.reload();
-//        recordsProductos();
-    } else { // si es false
-//        $("#divRegistrarFactura").hide();
-//        $("#divListadoFacturas").show();
-//        $("#formFactura")[0].reset();
-        limpiarForm();
-    }
-}
-function limpiarForm() {
-    $("#formFactura")[0].reset();
-}
+
 function detailsFactura(idFactura) {
-    mostrarForm(true);
+    mostrarForm(false);
     $("#btnAgregarArt").hide();
-    $("#btnGuardar").hide();
+//    $("#btnGuardar").hide();
+
+    // Aqui se muestra los campos de Factura
     $.get("../../app/controllers/factura.controller.php?opt=detailsFactura",
             {id_factura: idFactura},
             function (data) {
-                // console.log(data);
                 $.each(data, function (key, value) {
                     $("#" + key).val(value);
                 });
             }, "json");
 
-    //Aqui muestra los detalles de la factura
+    //Aqui muestra las filas de detalles de la factura
     tabDetfactura = $("#tblDetalles").DataTable({
         ajax: {
             url: "../../app/controllers/factura.controller.php?opt=detailDetFactura&id_factura=" + idFactura
@@ -69,38 +46,18 @@ function detailsFactura(idFactura) {
         "bDestroy": true
     });
 }
-function saveFactura(e) {
-    e.preventDefault();
-//   Toma los datos con el atributo name
-//    var formData = new FormData($("#formFactura")[0]);
-    var data = $("#formFactura").serializeArray();
-    console.log(data);
 
-    $.post("../../app/controllers/factura.controller.php?opt=saveFactura", data,
-            function () {
-                // clear fields from the popup
-                mostrarForm(false);
-                // read records again
-                tabla.ajax.reload();
-            });
-    if (tabDetfactura != null) {
-        tabDetfactura.clear().draw();
-        tabDetfactura.destroy();
-        tabDetfactura = null;
+function deleteFactura(idFactura) {
+    var conf = confirm("¿Estas Seguro, que quieres eliminar esta Factura?");
+    if (conf) {
+        $.get("../../app/controllers/factura.controller.php?opt=deleteFactura",
+                {id_factura: idFactura},
+                function () {
+                    tabla.ajax.reload();
+                });
     }
-    /*
-     $.ajax({
-     url: "../../app/controllers/factura.controller.php?opt=saveFactura",
-     type: "POST",
-     data: formData,
-     contentType: false,
-     processData: false,
-     success: function (data) {
-     tabla.ajax.reload();
-     }
-     });
-     */
 }
+
 function recordFacturas() {
     tabla = $("#tbListadoFacturas").DataTable({
         ajax: {
@@ -108,6 +65,43 @@ function recordFacturas() {
         }
     });
 }
+
+function recordClientes() {
+    $.post("../../app/controllers/factura.controller.php?opt=readClientes",
+            function (r) {
+                $("#id_cliente").html(r);
+            });
+}
+
+function recordsProductos() {
+    tabProductos = $("#tblProductos").DataTable({
+        ajax: {
+            url: "../../app/controllers/factura.controller.php?opt=readProductos"
+        },
+        "bDestroy": true
+    });
+}
+
+function btnAgregarFactura() {
+    recordClientes();//Recorrer filas
+    ultNumSerie(); // llena el numero de factura
+    recordsProductos();
+    // falta limpiar los inputs de factura
+    mostrarForm(false);
+    $("#btnAgregarArt").show();
+    var fn = new Date();
+    var dia = ("0" + fn.getDate()).slice(-2);
+    var mes = ("0" + (fn.getMonth() + 1)).slice(-2);
+    var hoy = fn.getFullYear() + "-" + (mes) + "-" + (dia);
+    $("#fec_fac").val(hoy);
+
+    if (tabDetfactura !== null) {
+        tabDetfactura.clear().draw();
+        tabDetfactura.destroy();
+        tabDetfactura = null;
+    }
+}
+
 function addDetallefactura(idProducto, descProducto) {
     var cantidad = 1;
     var precio_venta = 1;
@@ -126,41 +120,49 @@ function addDetallefactura(idProducto, descProducto) {
             '</tr>';
     cont++;
     detalles++;
-    $('#tblDetalles').append(filaDetalle);
+    $("#tblDetalles").append(filaDetalle);
+    $("#btnGuardar").show();
 }
-function recordClientes() {
-    $.post("../../app/controllers/factura.controller.php?opt=readClientes",
-            function (r) {
-                $("#id_cliente").html(r);
-//        $('#id_cliente').selectpicker('refresh');
-            });
+function deleteDetalle(indice) {
+    $("#fila" + indice).remove();
+    calcularTotal();
+    detalles -= 1;
+    if (detalles == 0) {
+        $("#btnGuardar").show();
+    }
 }
-function recordsProductos() {
-    tabProductos = $("#tblProductos").DataTable({
-        ajax: {
-            url: "../../app/controllers/factura.controller.php?opt=readProductos"
-        },
-        "bDestroy": true
-    });
+function mostrarForm(flag) {
+    if (flag) {// si es true
+        $("#divRegistrarFactura").hide();
+        $("#divListadoFacturas").show();
+    } else { // si es false
+        $("#divListadoFacturas").hide();
+        $("#divRegistrarFactura").show();
+        $("#btnGuardar").hide();
+//        limpiarForm();
+    }
+}
+function limpiarForm() {
+    $("#formFactura")[0].reset();
 }
 function cancelarForm() {
-//    limpiarForm();
-    mostrarForm(false);
+    mostrarForm(true);
+    limpiarForm();
+    $(".filas").remove();
 }
 function ultNumSerie() {
     var NumSerie = $("#serie option:selected").val();
     $.post("../../app/controllers/factura.controller.php?opt=readSerie", {numSerie: NumSerie},
             function (data) {
-                dataJson = JSON.parse(data);
                 numeroMostrar = "";
-                if (dataJson) {
-                    numero = parseInt(dataJson.num_factura, 10) + 1;
+                if (data) {
+                    numero = parseInt(data.num_factura, 10) + 1;
                     numeroMostrar = numero.toString().padStart(8, "0");
                 } else {
                     numeroMostrar = "00000001";
                 }
                 $("#num_factura").val(numeroMostrar);
-            });
+            }, "json");
 }
 function editSubTotales() {
     var cant = document.getElementsByName("cantProducto[]");
@@ -173,29 +175,15 @@ function editSubTotales() {
         inpS.value = factCant.value * factPrec.value;
         document.getElementsByName("subtotal")[i].innerHTML = inpS.value;
     }
-    calcularTotales();
+    calcularTotal();
 }
-function calcularTotales() {
+function calcularTotal() {
     var subTotal = document.getElementsByName("subtotal");
     var total = 0.0;
     for (var i = 0; i < subTotal.length; i++) {
-        total += document.getElementsByName("subtotal") [i].value;
+        subt = subTotal[i].value;
+        total = total + subt;
     }
-    //$("#total").html("S/." + total);
     $("#total_venta").val(total);
 }
-function deleteDetalle(indice) {
-    $("#fila" + indice).remove();
-    calcularTotales();
-    detalles -= 1;
-}
-function deleteFactura(idFactura) {
-    var conf = confirm("¿Estas Seguro, que quieres eliminar esta Factura?");
-    if (conf) {
-        $.get("../../app/controllers/factura.controller.php?opt=deleteFactura",
-                {id_factura: idFactura},
-                function (data) {
-                    tabla.ajax.reload();
-                });
-    }
-}
+
